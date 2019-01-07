@@ -1563,8 +1563,12 @@
 	function loadCamera(url, callback) {
 		var filename = '/camera_param_' + camera_count++;
 		var writeCallback = function() {
-			var id = Module._loadCamera(filename);
-			if (callback) callback(id);
+			if (!Module._loadCamera) {
+				setTimeout(writeCallback, 10);
+			} else {
+				var id = Module._loadCamera(filename);
+				if (callback) callback(id);
+			}
 		};
 		if (typeof url === 'object') { // Maybe it's a byte array
 			writeByteArrayToFS(filename, url, writeCallback);
@@ -1629,7 +1633,7 @@
 	window.ARCameraParam = ARCameraParam;
 
 	if (window.Module) {
-		runWhenLoaded();
+		window.Module.onRuntimeInitialized = runWhenLoaded;
 	} else {
 		window.Module = {
 			onRuntimeInitialized: function() {
