@@ -13,7 +13,7 @@ var
 var HAVE_NFT = 0;
 
 var EMSCRIPTEN_PATH = process.env.EMSCRIPTEN;
-var ARTOOLKIT5_ROOT = process.env.ARTOOLKIT5_ROOT || "../emscripten/artoolkit5";
+var ARTOOLKIT5_ROOT = process.env.ARTOOLKIT5_ROOT || path.resolve(__dirname, "../emscripten/artoolkit5");
 
 if (!EMSCRIPTEN_PATH) {
 	console.log("\nWarning: EMSCRIPTEN environment variable not found.")
@@ -30,6 +30,14 @@ var SOURCE_PATH = path.resolve(__dirname, '../emscripten/') + '/';
 var OUTPUT_PATH = path.resolve(__dirname, '../build/') + '/';
 var BUILD_FILE = 'artoolkit.debug.js';
 var BUILD_MIN_FILE = 'artoolkit.min.js';
+
+
+if (!fs.existsSync(path.resolve(ARTOOLKIT5_ROOT, 'include/AR/config.h'))) {
+	fs.copyFileSync(
+		path.resolve(ARTOOLKIT5_ROOT, 'include/AR/config.h.in'),
+		path.resolve(ARTOOLKIT5_ROOT, 'include/AR/config.h')
+	);
+}
 
 var MAIN_SOURCES = HAVE_NFT ? [
 	'NFT/ARMarkerNFT.c',
@@ -121,7 +129,7 @@ var FLAGS = '' + OPTIMIZE_FLAGS;
 FLAGS += ' -Wno-warn-absolute-paths ';
 FLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
 // FLAGS += ' -s FULL_ES2=1 '
-FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
+// FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
 FLAGS += ' --memory-init-file 0 '; // for memless file
 
 var PRE_FLAGS = ' --pre-js ' + path.resolve(__dirname, '../js/artoolkit.api.js') +' ';
