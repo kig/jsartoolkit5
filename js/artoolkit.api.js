@@ -195,26 +195,34 @@
 			});
 		}
 
-		var nftMarkerCount = this.nftMarkerCount;
-		artoolkit.detectNFTMarker(this.id);
-		for (var i=0; i<nftMarkerCount; i++) {
-			var markerInfo = this.getNFTMarker(i);
+		if (this.nftMarkers.length > 0) {
 
-			if (markerInfo.found) {
-				var visible = this.trackNFTMarkerId(i);
-				visible.matrix.set(markerInfo.pose);
-				visible.inCurrent = true;
-				this.transMatToGLMat(visible.matrix, this.transform_mat);
-				this.dispatchEvent({
-					name: 'getNFTMarker',
-					target: this,
-					data: {
-						index: i,
-						marker: markerInfo,
-						matrix: this.transform_mat
-					}
-				});
+			var nftMarkerCount = this.nftMarkerCount;
+			try {
+				artoolkit.detectNFTMarker(this.id);
+			} catch(err) {
+				// Oh man, division by zero.
 			}
+			for (var i=0; i<nftMarkerCount; i++) {
+				var markerInfo = this.getNFTMarker(i);
+
+				if (markerInfo.found) {
+					var visible = this.trackNFTMarkerId(i);
+					visible.matrix.set(markerInfo.pose);
+					visible.inCurrent = true;
+					this.transMatToGLMat(visible.matrix, this.transform_mat);
+					this.dispatchEvent({
+						name: 'getNFTMarker',
+						target: this,
+						data: {
+							index: i,
+							marker: markerInfo,
+							matrix: this.transform_mat
+						}
+					});
+				}
+			}
+
 		}
 
 		var multiMarkerCount = this.getMultiMarkerCount();

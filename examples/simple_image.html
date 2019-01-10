@@ -7,9 +7,10 @@
 <img id="v4" src="Data/kuva.jpg"></img>
 <img id="v5" src="Data/armchair.jpg"></img>
 
-<script src="../build/artoolkit.min.js"></script>
-<script>
+<script src="../build/artoolkit.debug.js"></script>
+<script src="../js/artoolkit.api.js"></script>
 
+<script>
 var cameraParam = new ARCameraParam();
 
 var ar1, ar2, ar3, ar4, ar5;
@@ -66,7 +67,6 @@ cameraParam.onload = function() {
 };
 
 cameraParam.load('Data/camera_para.dat');
-
 </script>
 
 </body>

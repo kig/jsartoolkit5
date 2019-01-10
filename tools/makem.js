@@ -39,12 +39,7 @@ if (!fs.existsSync(path.resolve(ARTOOLKIT5_ROOT, 'include/AR/config.h'))) {
 	);
 }
 
-var MAIN_SOURCES = HAVE_NFT ? [
-	'NFT/ARMarkerNFT.c',
-	'NFT/trackingSub.c',
-	'NFT/thread_sub.c',
-	'ARToolKitJS.cpp'
-] : [
+var MAIN_SOURCES = [
 	'ARToolKitJS.cpp'
 ];
 
