@@ -41,7 +41,7 @@ cameraParam.onload = function() {
 	ar5.debugDraw();
 
 	var assertEq = function(message, value, shouldBe) {
-		if (value !== shouldBe) {
+		if ( !(value === shouldBe || (typeof value === 'number' && Math.abs(value - shouldBe) < 1e-4)) ) {
 			throw(message + ' ' + value + ' is not the expected ' + shouldBe);
 		}
 	};
