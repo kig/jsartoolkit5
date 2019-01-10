@@ -195,12 +195,13 @@
 			});
 		}
 
-		if (this.nftMarkers.length > 0) {
+		if (this.nftMarkerCount > 0) {
 
 			var nftMarkerCount = this.nftMarkerCount;
 			try {
 				artoolkit.detectNFTMarker(this.id);
 			} catch(err) {
+				console.log(err);
 				// Oh man, division by zero.
 			}
 			for (var i=0; i<nftMarkerCount; i++) {
@@ -1240,10 +1241,13 @@
 		@return {HTMLVideoElement} Returns the created video element.
 	*/
 	ARController.getUserMedia = function(configuration) {
+
 		var facing = configuration.facingMode || 'environment';
 
 		var onSuccess = configuration.onSuccess;
-		var onError = configuration.onError || function(err) { console.error("ARController.getUserMedia", err); };
+		var onError = configuration.onError || function(err) { 
+			console.error("ARController.getUserMedia", err); 
+		};
 
 		var video = document.createElement('video');
 
@@ -1261,8 +1265,10 @@
 		];
 		var play = function() {
 			if (readyToPlay) {
-				video.play();
-				if (!video.paused) {
+				// video.play();
+				console.log(video.width);
+				if (!video.paused && video.width !== 0) {
+					onSuccess();
 					eventNames.forEach(function(eventName) {
 						window.removeEventListener(eventName, play, true);
 					});
@@ -1275,8 +1281,9 @@
 
 		var success = function(stream) {
 			video.addEventListener('loadedmetadata', initProgress, false);
-			video.src = window.URL.createObjectURL(stream);
+			video.srcObject = stream;
 			readyToPlay = true;
+			video.play();
 			play(); // Try playing without user input, should work on non-Android Chrome
 		};
 
@@ -1312,51 +1319,8 @@
 
 		mediaDevicesConstraints.facingMode = facing;
 
-		navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-		var hdConstraints = {
-			audio: false,
-			video: {
-				mandatory: constraints
-		  	}
-		};
-
-		if ( false ) {
-		// if ( navigator.mediaDevices || window.MediaStreamTrack) {
-			if (navigator.mediaDevices) {
-				navigator.mediaDevices.getUserMedia({
-					audio: false,
-					video: mediaDevicesConstraints
-				}).then(success, onError);
-			} else {
-				MediaStreamTrack.getSources(function(sources) {
-					var facingDir = mediaDevicesConstraints.facingMode;
-					if (facing && facing.exact) {
-						facingDir = facing.exact;
-					}
-					for (var i=0; i<sources.length; i++) {
-						if (sources[i].kind === 'video' && sources[i].facing === facingDir) {
-							hdConstraints.video.mandatory.sourceId = sources[i].id;
-							break;
-						}
-					}
-					if (facing && facing.exact && !hdConstraints.video.mandatory.sourceId) {
-						onError('Failed to get camera facing the wanted direction');
-					} else {
-						if (navigator.getUserMedia) {
-							navigator.getUserMedia(hdConstraints, success, onError);
-						} else {
-							onError('navigator.getUserMedia is not supported on your browser');
-						}
-					}
-				});
-			}
-		} else {
-			if (navigator.getUserMedia) {
-				navigator.getUserMedia(hdConstraints, success, onError);
-			} else {
-				onError('navigator.getUserMedia is not supported on your browser');
-			}
-		}
+		navigator.mediaDevices.getUserMedia({audio: false, video: true})
+		.then(success).catch(onError);
 
 		return video;
 	};
